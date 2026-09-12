@@ -57,15 +57,23 @@ Docker Compose also recognizes the legacy filename `docker-compose.yml` if you c
 2. Copy `.env.example` to `.env`. Enter your HTTPS NetBird origin and SMTP settings. Use literal unquoted values: Compose loads this file in raw mode.
 3. Create the ignored `secrets` directory. In your editor, create `secrets/netbird_api_token.txt` and `secrets/smtp_password.txt`. Put only the corresponding secret in each file. Do not paste secrets into chat, command arguments, issues, or source files.
 
-   On Linux, Compose mounts local secret files with their host ownership. The notifier runs as UID/GID 10001, so give that identity read-only access before starting it:
+   **Required on Linux before running any Docker Compose command that starts the notifier:** Compose mounts local secret files with their host ownership. The notifier runs as UID/GID 10001, so give that identity read-only access:
 
    ```bash
+   chmod 0700 secrets
    sudo chown 10001:10001 secrets/netbird_api_token.txt secrets/smtp_password.txt
    sudo chmod 0400 secrets/netbird_api_token.txt secrets/smtp_password.txt
    chmod 0600 .env
    ```
 
-   Do not make secret files globally readable. Windows operators should restrict their ACLs to the operator and required Docker identities. See [security](SECURITY.md).
+   Verify the metadata without displaying either secret:
+
+   ```bash
+   ls -ldn secrets
+   ls -ln secrets/netbird_api_token.txt secrets/smtp_password.txt
+   ```
+
+   Both files must show numeric owner and group `10001 10001` with read access for the owner. If this step is skipped, `--check-config`, `--dry-run`, `--test-email`, and the continuous container will fail with `operation_failed category=PermissionError`. Do not make secret files globally readable as a workaround. Windows operators should restrict their ACLs to the operator and required Docker identities. See [security](SECURITY.md).
 4. Pull the published versioned image and validate it:
 
 ```powershell
