@@ -1,6 +1,6 @@
 # Release process
 
-The owner confirmed real deployment testing and authorized publication of the public `netbird-notifier` repository.
+Normal development flows from `dev` into `main` and does not create a release. Start the GitHub Release workflow manually only after the owner explicitly approves a versioned release.
 
 ## Prepare locally
 
@@ -14,7 +14,7 @@ The owner confirmed real deployment testing and authorized publication of the pu
 
 ## Publish
 
-Create/configure the agreed GitHub repository, push only reviewed commits, and verify CI. Move the proposed changelog entry to version 0.1.0 with the actual release date. Create the agreed annotated/signed tag (normally `v0.1.0`) and publish release notes stating features, supported/tested environment, delivery limitations, upgrade/state instructions and security status.
+Merge the reviewed `dev` changes into `main` and verify CI. Move the changelog entry to the new version with the actual release date and create the agreed annotated/signed semantic-version tag. Manually run the Release workflow with that existing tag. It retests the tagged source, publishes versioned and `latest` GHCR images, and creates the GitHub release if it does not already exist.
 
 Do not publish a container registry image unless separately included in the agreed release scope. If distributing images, include provenance/SBOM and applicable third-party notices. Never distribute the development/test image as the runtime image.
 

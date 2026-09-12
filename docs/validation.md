@@ -20,6 +20,8 @@ Last updated 2026-09-12. Results apply to the current local pre-release tree and
 - The live state database was backed up with SQLite's online backup API while the notifier remained running, restored into a newly created isolated Docker volume, and passed an integrity check with the expected single notification record. The temporary restore volume was removed; the ignored host backup was retained privately.
 - The Compose project, runtime image and exact container name were changed to `netbird-notifier`. SQLite online backup migrated the expected single notification record into `netbird-notifier_notifier_state`; the renamed service became healthy and subsequent polls reported zero pending users. The original volume remains available locally as a rollback copy.
 - The final Compose smoke test creates a unique project-scoped state volume, verifies deduplication across containers, exercises healthy/unhealthy recovery, and removes only its synthetic resources. This also verifies test projects do not share the production volume.
+- On the `dev` branch, the pull-based Compose definition and separate local-build override both passed Compose validation. The local-build override built successfully, and the pull-based definition was exercised against the locally tagged GHCR image while preserving production state; the service returned healthy as UID/GID 10001 and accepted no duplicate alert.
+- The release workflow is manual-only, validates semantic-version tags, tests the exact tagged source, publishes immutable versioned and mutable `latest` GHCR tags with the repository workflow token, and refuses to replace an existing versioned image tag. GitHub-hosted execution and anonymous GHCR pull remain pending until these changes are approved for `main`.
 - Final source secret scan found zero findings in distributable files. `.env`, `secrets/`, state, Git metadata and generated scan artifacts were excluded by design and are ignored by Git; they require separate operator protection.
 
 ## Image scanning
@@ -34,6 +36,6 @@ The local scanner was Trivy using its downloaded advisory database. Docker Scout
 
 - Longer-running provider rate/relay behavior and token-rotation procedure.
 - Longer-running upgrade behavior across future NetBird releases.
-- GitHub CI execution and private vulnerability-reporting setup after repository publication.
+- GitHub CI execution for the current `dev` changes, first GHCR publication/anonymous pull, and private vulnerability-reporting setup.
 
 At the time of this record, no push, tag, GitHub release or public image had occurred. The owner confirmed real deployment acceptance and authorized public repository publication.

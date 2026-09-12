@@ -20,7 +20,7 @@ Corruption/disk-full errors must not be fixed by automatically deleting the data
 
 ## Upgrade
 
-Back up state, read the changelog, run tests, build the reviewed image and recreate only this service. Schema 2 adds failed-delivery ordering to schema 1 without deleting notification history. Do not run an older program against newer state unless that migration is explicitly supported; the original schema-1 application refuses schema 2.
+Back up state, read the changelog, pull the reviewed versioned image and recreate only this service with `docker compose pull` followed by `docker compose up -d`. Contributors can test a source checkout with `compose.build.yaml`. Schema 2 adds failed-delivery ordering to schema 1 without deleting notification history. Do not run an older program against newer state unless that migration is explicitly supported; the original schema-1 application refuses schema 2.
 
 The Python Alpine base is pinned to an image digest. The runtime removes the package installer because it has no third-party Python dependencies. Periodically review a newer supported base, scan it, update the digest and rerun container acceptance tests. Pinning is reproducibility, not automatic patching.
 

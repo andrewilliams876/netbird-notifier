@@ -4,7 +4,7 @@ An independent community project for use with self-hosted NetBird. Not affiliate
 
 Poll the NetBird users API and email administrators when a user needs approval. The notifier sends mail directly through your SMTP provider; NetBird does not need SMTP configured. It never approves users or changes NetBird.
 
-**Status:** version 0.1.0 release candidate. Live acceptance testing and local security checks passed; see [validation](docs/validation.md) for the evidence and limitations.
+**Status:** version 0.1.0. Live acceptance testing and security checks passed; see [validation](docs/validation.md) for the evidence and limitations.
 
 ```text
 Self-hosted NetBird API <-- HTTPS GET -- Notifier -- SMTP/TLS --> Your mail provider
@@ -25,16 +25,27 @@ SMTP acceptance is not proof of inbox delivery. A crash after SMTP acceptance bu
 
 ## Quick start
 
-Requires Docker Desktop in Linux-container mode or Docker Engine, with Compose 2.30+. Run these commands from the project directory. Do not run inside the existing NetBird Compose project.
+Requires Docker Desktop in Linux-container mode or Docker Engine, with Compose 2.30+. You only need `compose.yaml` and `.env.example`; cloning the source repository is optional:
+
+```powershell
+New-Item -ItemType Directory netbird-notifier
+Set-Location netbird-notifier
+curl.exe -LO https://raw.githubusercontent.com/andrewilliams876/netbird-notifier/main/compose.yaml
+curl.exe -LO https://raw.githubusercontent.com/andrewilliams876/netbird-notifier/main/.env.example
+Copy-Item .env.example .env
+New-Item -ItemType Directory secrets
+```
+
+Run the remaining commands from that directory. Do not place this Compose file inside the existing NetBird Compose project.
 
 1. Create a dedicated NetBird API identity. Prefer an Auditor role if available and able to list the required users. Verify visibility using a known pending user; a successful empty response alone is not sufficient. Do not use an Owner token. See [configuration](docs/configuration.md).
 2. Copy `.env.example` to `.env`. Enter your HTTPS NetBird origin and SMTP settings. Use literal unquoted values: Compose loads this file in raw mode.
 3. Create the ignored `secrets` directory. In your editor, create `secrets/netbird_api_token.txt` and `secrets/smtp_password.txt`. Put only the corresponding secret in each file. Do not paste secrets into chat, command arguments, issues, or source files. Restrict host access; see [security](SECURITY.md).
-4. Validate and build:
+4. Pull the published versioned image and validate it:
 
 ```powershell
 docker compose config --quiet
-docker compose build
+docker compose pull
 docker compose run --rm notifier --check-config
 docker compose run --rm notifier --dry-run
 ```
@@ -86,11 +97,12 @@ Python 3.12+; the application has no third-party Python runtime dependencies.
 python -m venv .venv
 .venv\Scripts\python -m pip install -r requirements-dev.txt
 .venv\Scripts\python -m unittest discover -s tests -v
+docker compose -f compose.yaml -f compose.build.yaml build
 ```
 
 TLS integration tests generate temporary certificates and use only local synthetic HTTPS/SMTP servers. They require the development dependency; without it they are skipped. No production credentials are needed.
 
-To repeat container checks, build `Dockerfile.test` as `netbird-notifier-tests:local`, run that image, and run `./tests/check-container.ps1` in PowerShell from this directory. The script creates and removes a uniquely named synthetic Compose project; it preserves production state. Do not use its synthetic credentials for real deployment.
+The development override builds the current checkout as `netbird-notifier:dev`; normal Compose usage pulls the versioned GHCR image. To repeat container checks, first build the runtime as `netbird-notifier:0.1.0`, build `Dockerfile.test` as `netbird-notifier-tests:local`, run that image, and run `./tests/check-container.ps1` in PowerShell. The script creates and removes a uniquely named synthetic Compose project and preserves production state. Do not use its synthetic credentials for real deployment.
 
 See [contributing](CONTRIBUTING.md), [security review](docs/security-review.md), [operations](docs/operations.md), [legal findings](docs/legal-and-licensing.md), [roadmap](ROADMAP.md), and [release process](docs/releasing.md).
 

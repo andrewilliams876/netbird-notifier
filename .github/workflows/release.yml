@@ -1,13 +1,6 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*"
-    branches:
-      - main
-    paths:
-      - .github/workflows/release.yml
   workflow_dispatch:
     inputs:
       tag:
@@ -23,8 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: write
     env:
-      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || (github.ref_type == 'tag' && github.ref_name || 'v0.1.0') }}
+      RELEASE_TAG: ${{ inputs.tag }}
       GH_TOKEN: ${{ github.token }}
     steps:
       - name: Validate release tag
@@ -41,15 +35,44 @@ jobs:
           ref: ${{ env.RELEASE_TAG }}
 
       - name: Build production image
-        run: docker build -t netbird-notifier:${RELEASE_TAG#v} .
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+          docker build \
+            --build-arg VERSION="$VERSION" \
+            --build-arg REVISION="$(git rev-parse HEAD)" \
+            --label "org.opencontainers.image.title=netbird-notifier" \
+            --label "org.opencontainers.image.description=Pending-user email notifier for self-hosted NetBird" \
+            --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
+            --label "org.opencontainers.image.url=https://github.com/$GITHUB_REPOSITORY" \
+            --label "org.opencontainers.image.licenses=MIT" \
+            --label "org.opencontainers.image.version=$VERSION" \
+            --label "org.opencontainers.image.revision=$(git rev-parse HEAD)" \
+            -t "netbird-notifier:$VERSION" \
+            -t "$IMAGE:$VERSION" .
 
       - name: Build and run test image
         run: |
-          docker tag netbird-notifier:${RELEASE_TAG#v} netbird-notifier:0.1.0
+          VERSION="${RELEASE_TAG#v}"
+          docker tag "netbird-notifier:$VERSION" netbird-notifier:0.1.0
           docker build -f Dockerfile.test -t netbird-notifier-tests:release .
           docker run --rm --read-only --cap-drop ALL \
             --security-opt no-new-privileges:true --pids-limit 64 --memory 256m \
             --tmpfs /tmp:rw,noexec,nosuid,size=64m netbird-notifier-tests:release
+
+      - name: Publish container image
+        shell: bash
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+          echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          if docker manifest inspect "$IMAGE:$VERSION" >/dev/null 2>&1; then
+            echo "Refusing to overwrite existing image tag $IMAGE:$VERSION" >&2
+            exit 1
+          fi
+          docker push "$IMAGE:$VERSION"
+          docker tag "$IMAGE:$VERSION" "$IMAGE:latest"
+          docker push "$IMAGE:latest"
 
       - name: Publish GitHub release
         shell: bash

@@ -1,10 +1,12 @@
 # Contributing
 
+Create changes from the `dev` branch. Test and push work to `dev`, then open a pull request into `main`. Do not commit directly to `main`. Updating `main` does not publish a release; releases are started explicitly with the manual Release workflow and an existing semantic-version tag.
+
 The repository is being prepared for its first release. Confirm its final license before submitting external contributions.
 
 Use Python 3.12+, install `requirements-dev.txt`, and run `python -m unittest discover -s tests -v`. Tests use synthetic data only. Production has no third-party Python dependencies. Keep imports, validation and networking straightforward; add tests for meaningful behavior and failure modes rather than implementation details.
 
-For Docker testing, build the production image, then `docker build -f Dockerfile.test -t netbird-notifier-tests:local .` and run the test image with a writable `/tmp` and read-only root. Do not publish the test image as the production image.
+For local Compose development, use `docker compose -f compose.yaml -f compose.build.yaml build`. For Docker testing, build the production image as `netbird-notifier:0.1.0`, then `docker build -f Dockerfile.test -t netbird-notifier-tests:local .` and run the test image with a writable `/tmp` and read-only root. Do not publish the test image as the production image.
 
 Before submitting changes:
 

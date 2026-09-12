@@ -1,0 +1,6 @@
+# Development override: build the current checkout instead of pulling GHCR.
+services:
+  notifier:
+    build: .
+    image: netbird-notifier:dev
+    pull_policy: build
