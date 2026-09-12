@@ -462,8 +462,53 @@ def prepare_creation_events(config, db, snapshot):
     return baselines
 
 
+def prepare_pending_episode(config, db, snapshot):
+    """Rearm a user only after a successful poll observed it was no longer pending."""
+    scope = digest(config.url, config.namespace)
+    db.execute("BEGIN IMMEDIATE")
+    try:
+        row = db.execute("SELECT active FROM event_baselines WHERE scope=? AND event=?",
+                         (scope, USER_PENDING)).fetchone()
+        if USER_PENDING not in config.enabled_events:
+            if row:
+                db.execute("UPDATE event_baselines SET active=0 WHERE scope=? AND event=?",
+                           (scope, USER_PENDING))
+            db.execute("COMMIT")
+            return
+
+        items = snapshot[USER_PENDING]
+        current = {event_key(config, USER_PENDING, item["id"]): item for item in items}
+        if row is None or row[0] == 0:
+            # On upgrade or re-enable, establish presence without replaying delivery history.
+            db.execute("DELETE FROM observed WHERE scope=? AND event=?", (scope, USER_PENDING))
+            for object_key in current:
+                db.execute("INSERT INTO observed VALUES (?, ?, ?)",
+                           (scope, USER_PENDING, object_key))
+            db.execute("INSERT OR REPLACE INTO event_baselines VALUES (?, ?, 1, ?)",
+                       (scope, USER_PENDING, int(time.time())))
+        else:
+            previous = {record[0] for record in db.execute(
+                "SELECT object_key FROM observed WHERE scope=? AND event=?",
+                (scope, USER_PENDING))}
+            for object_key, item in current.items():
+                if object_key not in previous:
+                    for recipient in config.recipients:
+                        key = delivery_key(config, USER_PENDING, item["id"], recipient)
+                        db.execute("DELETE FROM sent WHERE key=?", (key,))
+                        db.execute("DELETE FROM retries WHERE key=?", (key,))
+            db.execute("DELETE FROM observed WHERE scope=? AND event=?", (scope, USER_PENDING))
+            for object_key in current:
+                db.execute("INSERT INTO observed VALUES (?, ?, ?)",
+                           (scope, USER_PENDING, object_key))
+        db.execute("COMMIT")
+    except BaseException:
+        db.execute("ROLLBACK")
+        raise
+
+
 def poll(config, db, fetch=fetch_snapshot, send=send_alert, stop=None):
     snapshot = normalize_snapshot(config, fetch(config))
+    prepare_pending_episode(config, db, snapshot)
     baselines = prepare_creation_events(config, db, snapshot)
     if baselines:
         counts = " ".join(f"{event}={count}" for event, count in baselines.items())

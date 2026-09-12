@@ -33,7 +33,7 @@ Scope: Python notifier including v0.2.0 user/peer snapshot detection, configurat
 - Network timeout is per socket operation; a slow peer or many SMTP commands can make a cycle longer. Stop signals are handled between deliveries; forced shutdown can interrupt one delivery and create ambiguity.
 - Health reflects a recent successful polling cycle; it is not proof of email arrival. Long backlogs or slow providers can temporarily make a functioning process unhealthy. Docker does not restart solely due to unhealthy status.
 - New work is prioritized over failures; an unbounded influx can delay retries. Per-poll caps limit attempts, not an absolute daily quota. Digest and stronger global rate policy are future work.
-- State grows with unique notifications, observed object digests and failures and has no automatic retention deletion. This preserves lifetime deduplication; operator monitoring and explicit retention policy are required.
+- State grows with unique creation notifications, observed object digests and failures and has no automatic retention deletion. This preserves creation-event lifetime deduplication and pending-episode presence; operator monitoring and explicit retention policy are required.
 - SQLite on network/shared filesystems is unsupported. Multiple separate volumes can send duplicates. This is not a distributed delivery system.
 - Runtime has no third-party Python packages or package installer; Python, OpenSSL, SQLite and OS packages still require vulnerability monitoring. See validation for the point-in-time scan result; no vulnerability-free claim is made.
 

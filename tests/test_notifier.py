@@ -235,14 +235,16 @@ class NotifierTests(unittest.TestCase):
         self.assertEqual(retry.call_args.args[2], "second@example.com")
         self.assertEqual(db.execute("SELECT count(*) FROM observed").fetchone()[0], 2)
 
-    def test_dedup_survives_restart_and_reapproval(self):
+    def test_pending_alert_rearms_only_after_observed_absence(self):
         send = MagicMock()
         with closing(app.open_state(self.config)) as db:
             self.assertEqual(app.poll(self.config, db, lambda _: [USER], send), 1)
         with closing(app.open_state(self.config)) as db:
-            self.assertEqual(app.poll(self.config, db, lambda _: [], send), 0)
             self.assertEqual(app.poll(self.config, db, lambda _: [USER], send), 0)
-        send.assert_called_once()
+            self.assertEqual(app.poll(self.config, db, lambda _: [], send), 0)
+            self.assertEqual(app.poll(self.config, db, lambda _: [USER], send), 1)
+            self.assertEqual(app.poll(self.config, db, lambda _: [USER], send), 0)
+        self.assertEqual(send.call_count, 2)
 
     def test_recipient_failure_retries_only_failed_recipient(self):
         config = replace(self.config, recipients=("first@example.com", "second@example.com"))

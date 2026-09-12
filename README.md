@@ -20,7 +20,7 @@ Self-hosted NetBird API <-- HTTPS GET -- Notifier -- SMTP/TLS --> Your mail prov
 - Peer-added alerts include the NetBird overlay address and the public connection address returned by NetBird's peers API.
 - Existing pending users are notified on first startup. Creation events silently record the current users, service users, or peers when first enabled, then alert only for later IDs. This prevents an upgrade or first installation from announcing every existing object.
 - Running a polling cycle with a creation event disabled records it as disabled. Its next enablement establishes a new silent baseline, so objects created while it was disabled are not replayed.
-- One accepted alert per event, object ID, and recipient for the lifetime of a state namespace. Approval followed by another pending period does not rearm that user's pending alert; approval can separately produce a joined-user alert.
+- Pending-user alerts are sent once per continuous pending-approval episode and recipient. A successful poll that observes the user is no longer pending rearms that user ID, so a later approval request alerts again. Creation-event alerts remain once per event, object ID, and recipient for the lifetime of a state namespace.
 - Separate deliveries and state for each recipient; unsuccessful deliveries are retried with backoff. New deliveries precede old failures to avoid a failed recipient blocking the queue.
 - TLS and certificate verification are required by default. STARTTLS and implicit TLS are supported; SMTP username/password authentication or unauthenticated relays are supported. OAuth-only SMTP is not implemented.
 - No inbound ports, NetBird changes, host networking, privileged mode, or Docker socket are needed.

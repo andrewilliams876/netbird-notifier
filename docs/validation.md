@@ -6,7 +6,7 @@ Last updated 2026-09-12. Results apply to the current local pre-release tree and
 
 - 47 Python tests inside the restricted Linux test image. Six tests use temporary local certificates and synthetic HTTPS/SMTP servers. The synthetic suite uses no external NetBird or mail account.
 - HTTPS verification, hostname mismatch, untrusted certificates, redirects, unauthorized responses, STARTTLS-before-authentication, implicit TLS, and missing STARTTLS behavior.
-- Strict user/peer schemas, regular/service-user classification, active-user filtering, silent creation baselines, enable/disable rebaselining, approval-to-joined transitions, per-recipient retries, lifetime deduplication, restart persistence, schema-1/2-to-3 migration, corruption preservation, lock contention, failed-state commits and safe logs.
+- Strict user/peer schemas, regular/service-user classification, active-user filtering, silent creation baselines, enable/disable rebaselining, pending-episode rearming after observed absence, approval-to-joined transitions, per-recipient retries, creation-event lifetime deduplication, restart persistence, schema-1/2-to-3 migration, corruption preservation, lock contention, failed-state commits and safe logs.
 - End-to-end local TLS tests delivered the pending-user, user-joined, service-user-created and peer-added templates, then verified restart deduplication and exactly one users plus one peers request per enabled polling cycle.
 - Production/test image builds with the pinned official Python Alpine base.
 - Compose configuration and secret mounts using synthetic values.

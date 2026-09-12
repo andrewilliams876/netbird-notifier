@@ -36,7 +36,8 @@ The Python Alpine base is pinned to an image digest. The runtime removes the pac
 | SMTP accepted but no inbox email | Spam folder, provider delivery logs, recipient address, sender DNS/authentication |
 | `PermissionError` immediately at startup or during `--check-config` | On Linux, make both `secrets/*.txt` files owned by UID/GID 10001 with mode `0400`; on Windows, check ACLs and Docker file sharing |
 | Cannot write state | Volume mount/ownership, free space, integrity, another process holding the lock |
-| No repeated alert | Expected lifetime deduplication; check user ID, recipient and namespace |
+| No repeated pending-user alert | The user must be observed absent from the pending set during at least one successful poll before the same ID is rearmed; check poll logs, recipient and namespace |
+| No repeated creation-event alert | Expected lifetime deduplication for the event and object ID; check recipient and namespace |
 | No joined/service-user/peer-added alert immediately after enabling | Expected silent first baseline; check `baselined` in logs, then create a controlled new object |
 | New event category is absent | Confirm its `ALERT_*` setting is exactly `true`, run `--dry-run`, and verify the API identity can list that resource |
 | Backlog | Per-poll attempt cap, failing recipients, provider throttling and network delays |
