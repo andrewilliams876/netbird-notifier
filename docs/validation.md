@@ -1,6 +1,6 @@
 # Validation record
 
-Last updated 2026-09-12. Results apply to the v0.2.0 release candidate and its locally built image. Published-image verification is recorded after the release workflow completes.
+Last updated 2026-09-12. Results apply to the released v0.2.0 source and container image.
 
 ## Passed
 
@@ -32,6 +32,9 @@ Last updated 2026-09-12. Results apply to the v0.2.0 release candidate and its l
 - An anonymous pull using an empty Docker credential directory downloaded `ghcr.io/andrewilliams876/netbird-notifier:0.1.0` with digest `sha256:522bc1fe28b81ced82894777e9692a08948b56cca9e15d6bb3ecdb80d34ee6d3`. The production Compose service was recreated from that registry image, retained its state volume, became healthy as UID/GID 10001, and accepted no duplicate alert.
 - Final source secret scan found zero findings in distributable files. `.env`, `secrets/`, state, Git metadata and generated scan artifacts were excluded by design and are ignored by Git; they require separate operator protection.
 - Gitleaks scanned all reachable commits with redaction enabled and found no credential leaks. The v0.1.0 annotated tag was recreated with the maintainer's GitHub no-reply identity so its public metadata does not expose a private email address.
+- GitHub Actions passed on `dev`, `main` and tag `v0.2.0`. The manually authorized release workflow retested the tagged source, published the GitHub release, pushed immutable image `0.2.0`, and updated `latest`.
+- An anonymous registry pull downloaded `0.2.0` at digest `sha256:123d387fd39d05f8a138d9723c4d7a16fab64dec8dd0c2c20d1b7a2ab0e9ba16`; `latest` resolved to the same digest. The published image reports application and OCI version `0.2.0`, runs as UID/GID 10001, and contains neither tests nor Python package-installation tooling.
+- A final Trivy scan of the published `0.2.0` image reported zero known vulnerabilities, zero embedded-secret findings and zero misconfigurations.
 
 ## Image scanning
 
@@ -50,4 +53,4 @@ The local scanner was Trivy using its downloaded advisory database. Docker Scout
 - Private vulnerability-reporting setup.
 - Routing-peer disconnection/deletion and third-party delivery channels remain roadmap work rather than v0.2.0 features.
 
-The owner completed controlled live validation of pending-user rearming and peer-added delivery against self-hosted NetBird Management v0.78.1 and Zoho SMTP. Earlier controlled validation also confirmed joined-user and service-user delivery. The release workflow must still retest the tagged source, publish the immutable image, and create the GitHub release.
+The owner completed controlled live validation of pending-user rearming and peer-added delivery against self-hosted NetBird Management v0.78.1 and Zoho SMTP. Earlier controlled validation also confirmed joined-user and service-user delivery. Version 0.2.0 was released after the tagged-source workflow and published-image checks passed.
