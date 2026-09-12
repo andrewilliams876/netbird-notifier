@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Build runtime
-        run: docker build -t netbird-notifier:0.1.0 .
+        run: docker build -t netbird-notifier:dev .
       - name: Build test image
         run: docker build -f Dockerfile.test -t netbird-notifier-tests:local .
       - name: Run isolated synthetic tests

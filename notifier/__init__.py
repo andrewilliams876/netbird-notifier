@@ -1,3 +1,3 @@
-"""Independent pending-user notifier for self-hosted NetBird."""
+"""Independent email event notifier for self-hosted NetBird."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

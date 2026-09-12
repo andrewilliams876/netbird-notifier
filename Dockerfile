@@ -3,7 +3,7 @@ FROM ${PYTHON_IMAGE}
 ARG VERSION=dev
 ARG REVISION=unknown
 LABEL org.opencontainers.image.title="netbird-notifier" \
-      org.opencontainers.image.description="Pending-user email notifier for self-hosted NetBird" \
+      org.opencontainers.image.description="Email event notifier for self-hosted NetBird" \
       org.opencontainers.image.source="https://github.com/andrewilliams876/netbird-notifier" \
       org.opencontainers.image.url="https://github.com/andrewilliams876/netbird-notifier" \
       org.opencontainers.image.licenses="MIT" \

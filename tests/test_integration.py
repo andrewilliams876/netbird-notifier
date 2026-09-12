@@ -14,7 +14,7 @@ import unittest
 import urllib.error
 
 from notifier import app
-from test_notifier import USER, environment
+from test_notifier import ACTIVE_USER, PEER, SERVICE_USER, USER, all_events, environment
 
 try:
     from cryptography import x509
@@ -36,7 +36,9 @@ class APIHandler(BaseHTTPRequestHandler):
         if self.server.status == 302:
             self.send_header("Location", "https://localhost:1/do-not-follow")
         self.end_headers()
-        self.wfile.write(json.dumps(self.server.payload).encode())
+        payload = self.server.payload.get(self.path, []) if isinstance(self.server.payload, dict) \
+            else self.server.payload
+        self.wfile.write(json.dumps(payload).encode())
 
 
 class MailHandler(socketserver.BaseRequestHandler):
@@ -151,6 +153,32 @@ class IntegrationTests(unittest.TestCase):
             self.assertEqual(mail.auth_secure, [True])
             self.assertEqual(api.requests, [("/api/users", "Token test-only-token")] * 2)
             self.assertTrue(app.healthy(config))
+
+    def test_all_v020_events_end_to_end(self):
+        with running(self.api()) as api, running(self.mail()) as mail:
+            api.payload = {"/api/users": [USER, ACTIVE_USER, SERVICE_USER], "/api/peers": [PEER]}
+            config = all_events(replace(self.config, url=f"https://localhost:{api.server_port}",
+                                        api_ca=str(self.ca), host="localhost",
+                                        port=mail.server_address[1], smtp_ca=str(self.ca)))
+            with closing(app.open_state(config)) as db:
+                self.assertEqual(app.poll(config, db), 1)
+                api.payload["/api/users"].extend([
+                    {**ACTIVE_USER, "id": "active-new"},
+                    {**SERVICE_USER, "id": "service-new"},
+                ])
+                api.payload["/api/peers"].append({**PEER, "id": "peer-new"})
+                self.assertEqual(app.poll(config, db), 3)
+                self.assertEqual(app.poll(config, db), 0)
+            subjects = [line for message in mail.messages for line in message.split(b"\r\n")
+                        if line.startswith(b"Subject:")]
+            self.assertEqual(subjects, [b"Subject: NetBird user awaiting approval",
+                                        b"Subject: NetBird user joined",
+                                        b"Subject: NetBird service user created",
+                                        b"Subject: NetBird peer added"])
+            self.assertEqual(api.requests,
+                             [item for _ in range(3) for item in
+                              (("/api/users", "Token test-only-token"),
+                               ("/api/peers", "Token test-only-token"))])
 
     def test_https_untrusted_and_wrong_hostname_rejected(self):
         with running(self.api()) as api:

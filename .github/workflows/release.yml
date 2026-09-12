@@ -42,7 +42,7 @@ jobs:
             --build-arg VERSION="$VERSION" \
             --build-arg REVISION="$(git rev-parse HEAD)" \
             --label "org.opencontainers.image.title=netbird-notifier" \
-            --label "org.opencontainers.image.description=Pending-user email notifier for self-hosted NetBird" \
+            --label "org.opencontainers.image.description=Email event notifier for self-hosted NetBird" \
             --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
             --label "org.opencontainers.image.url=https://github.com/$GITHUB_REPOSITORY" \
             --label "org.opencontainers.image.licenses=MIT" \
@@ -54,8 +54,8 @@ jobs:
       - name: Build and run test image
         run: |
           VERSION="${RELEASE_TAG#v}"
-          docker tag "netbird-notifier:$VERSION" netbird-notifier:0.1.0
-          docker build -f Dockerfile.test -t netbird-notifier-tests:release .
+          docker build --build-arg "RUNTIME_IMAGE=netbird-notifier:$VERSION" \
+            -f Dockerfile.test -t netbird-notifier-tests:release .
           docker run --rm --read-only --cap-drop ALL \
             --security-opt no-new-privileges:true --pids-limit 64 --memory 256m \
             --tmpfs /tmp:rw,noexec,nosuid,size=64m netbird-notifier-tests:release
@@ -82,10 +82,11 @@ jobs:
             exit 0
           fi
           cat > release-notes.md <<'EOF'
-          Independent pending-user email notifier for self-hosted NetBird.
+          Independent email event notifier for self-hosted NetBird.
 
           Highlights:
-          - Read-only polling of users awaiting approval
+          - Read-only polling of enabled user and peer events
+          - Silent baselines for creation-event detection
           - Provider-agnostic SMTP with STARTTLS or implicit TLS
           - Optional sender display name
           - Persistent per-recipient deduplication in SQLite

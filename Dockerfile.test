@@ -1,5 +1,6 @@
 # Test-only image; never distribute this as the production image.
-FROM netbird-notifier:0.1.0
+ARG RUNTIME_IMAGE=netbird-notifier:dev
+FROM ${RUNTIME_IMAGE}
 USER root
 COPY requirements-dev.txt /tmp/requirements-dev.txt
 RUN python -m ensurepip --upgrade \
