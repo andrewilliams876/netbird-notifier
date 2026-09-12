@@ -1,4 +1,6 @@
-# Pending-user notifier for self-hosted NetBird
+# NetBird Notifier
+
+Secure pending-user email notifications for self-hosted NetBird.
 
 An independent community project for use with self-hosted NetBird. Not affiliated with or endorsed by NetBird.
 
@@ -67,6 +69,27 @@ docker compose ps
 ```
 
 Only the notifier is started by this Compose file. Keep its volume: **`docker compose down --volumes` deletes deduplication history and can repeat alerts.** Ordinary `docker compose down` preserves the named volume.
+
+## Upgrading
+
+Stable deployments use an explicit image version in `compose.yaml`. Read the release notes, change the image tag from the installed version to the new release, then run:
+
+```powershell
+docker compose pull
+docker compose up -d
+docker compose ps
+docker compose logs --tail 50 notifier
+```
+
+For example, an upgrade from `0.1.0` to `0.2.0` changes only this line before the commands above:
+
+```yaml
+image: ghcr.io/andrewilliams876/netbird-notifier:0.2.0
+```
+
+Compose recreates the container with the downloaded image and retains the named state volume. Never add `--volumes` during an ordinary upgrade. To roll back, restore the previous image tag and run the same pull/up commands, provided the older release supports the current state schema.
+
+The mutable `latest` tag is published for convenience, but the versioned tag is recommended for predictable deployments. Changes merged into `main` run validation and update the `main` preview image without becoming a stable release. A maintainer-approved release publishes a new versioned image, updates `latest`, and creates the corresponding GitHub release.
 
 ## Zoho and other providers
 

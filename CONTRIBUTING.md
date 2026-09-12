@@ -1,6 +1,6 @@
 # Contributing
 
-Create changes from the `dev` branch. Test and push work to `dev`, then open a pull request into `main`. Do not commit directly to `main`. Updating `main` does not publish a release; releases are started explicitly with the manual Release workflow and an existing semantic-version tag.
+Create changes from the `dev` branch. Test and push work to `dev`, then open a pull request into `main`. Do not commit directly to `main`. Updating `main` publishes only the mutable `main` preview image. Stable versioned and `latest` images are published through the explicit Release workflow with an existing semantic-version tag.
 
 The repository is being prepared for its first release. Confirm its final license before submitting external contributions.
 

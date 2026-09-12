@@ -4,7 +4,7 @@
 
 - Default Compose deployment pulls the versioned image from GitHub Container Registry.
 - Added an explicit local-build Compose override and a dev-to-main contribution flow.
-- Release and container publication now require a manually started workflow; versioned image tags are not overwritten.
+- Main updates publish a `main` preview image; stable release publication remains explicit and versioned image tags are not overwritten.
 - Added OCI source, license, version and revision metadata to locally and remotely built images.
 
 ## [0.1.0] - 2026-09-12
