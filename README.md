@@ -40,6 +40,19 @@ New-Item -ItemType Directory secrets
 
 Run the remaining commands from that directory. Do not place this Compose file inside the existing NetBird Compose project.
 
+Before starting the notifier, the deployment directory must have this structure:
+
+```text
+netbird-notifier/
+├── .env
+├── compose.yaml
+└── secrets/
+    ├── netbird_api_token.txt
+    └── smtp_password.txt
+```
+
+Docker Compose also recognizes the legacy filename `docker-compose.yml` if you choose to rename `compose.yaml`.
+
 1. Create a dedicated NetBird API identity. Prefer an Auditor role if available and able to list the required users. Verify visibility using a known pending user; a successful empty response alone is not sufficient. Do not use an Owner token. See [configuration](docs/configuration.md).
 2. Copy `.env.example` to `.env`. Enter your HTTPS NetBird origin and SMTP settings. Use literal unquoted values: Compose loads this file in raw mode.
 3. Create the ignored `secrets` directory. In your editor, create `secrets/netbird_api_token.txt` and `secrets/smtp_password.txt`. Put only the corresponding secret in each file. Do not paste secrets into chat, command arguments, issues, or source files.
