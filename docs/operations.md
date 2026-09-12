@@ -34,7 +34,7 @@ The Python Alpine base is pinned to an image digest. The runtime removes the pac
 | Protocol error | API version/shape, JSON content type, proxy returning login HTML, redirects, response size |
 | SMTP failure | Provider host/port, TLS mode, permitted sender, app password, authentication policy, quotas |
 | SMTP accepted but no inbox email | Spam folder, provider delivery logs, recipient address, sender DNS/authentication |
-| Cannot read secret files | Windows ACLs or Linux file ownership and non-root UID readability |
+| `PermissionError` immediately at startup or during `--check-config` | On Linux, make both `secrets/*.txt` files owned by UID/GID 10001 with mode `0400`; on Windows, check ACLs and Docker file sharing |
 | Cannot write state | Volume mount/ownership, free space, integrity, another process holding the lock |
 | No repeated alert | Expected lifetime deduplication; check user ID, recipient and namespace |
 | Backlog | Per-poll attempt cap, failing recipients, provider throttling and network delays |

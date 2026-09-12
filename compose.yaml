@@ -39,6 +39,8 @@ services:
         max-size: 5m
         max-file: "3"
 secrets:
+  # Linux bind-mounted files must be readable by the container's UID/GID 10001.
+  # Recommended host ownership/mode: 10001:10001 and 0400.
   netbird_api_token:
     file: ./secrets/netbird_api_token.txt
   smtp_password:

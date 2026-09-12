@@ -42,7 +42,17 @@ Run the remaining commands from that directory. Do not place this Compose file i
 
 1. Create a dedicated NetBird API identity. Prefer an Auditor role if available and able to list the required users. Verify visibility using a known pending user; a successful empty response alone is not sufficient. Do not use an Owner token. See [configuration](docs/configuration.md).
 2. Copy `.env.example` to `.env`. Enter your HTTPS NetBird origin and SMTP settings. Use literal unquoted values: Compose loads this file in raw mode.
-3. Create the ignored `secrets` directory. In your editor, create `secrets/netbird_api_token.txt` and `secrets/smtp_password.txt`. Put only the corresponding secret in each file. Do not paste secrets into chat, command arguments, issues, or source files. Restrict host access; see [security](SECURITY.md).
+3. Create the ignored `secrets` directory. In your editor, create `secrets/netbird_api_token.txt` and `secrets/smtp_password.txt`. Put only the corresponding secret in each file. Do not paste secrets into chat, command arguments, issues, or source files.
+
+   On Linux, Compose mounts local secret files with their host ownership. The notifier runs as UID/GID 10001, so give that identity read-only access before starting it:
+
+   ```bash
+   sudo chown 10001:10001 secrets/netbird_api_token.txt secrets/smtp_password.txt
+   sudo chmod 0400 secrets/netbird_api_token.txt secrets/smtp_password.txt
+   chmod 0600 .env
+   ```
+
+   Do not make secret files globally readable. Windows operators should restrict their ACLs to the operator and required Docker identities. See [security](SECURITY.md).
 4. Pull the published versioned image and validate it:
 
 ```powershell
