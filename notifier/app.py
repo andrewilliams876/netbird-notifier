@@ -7,6 +7,7 @@ from email.headerregistry import Address
 from email.message import EmailMessage
 from email.utils import formatdate
 import hashlib
+import ipaddress
 import json
 import logging
 import os
@@ -214,10 +215,18 @@ def parse_peers(payload):
         if (not isinstance(peer, dict) or not isinstance(peer.get("id"), str)
                 or not 1 <= len(peer["id"]) <= 1024 or peer["id"] in seen):
             raise ProtocolError("Invalid peer schema; no alerts sent")
+        connection_ip = ""
+        raw_connection_ip = peer.get("connection_ip")
+        if isinstance(raw_connection_ip, str) and raw_connection_ip:
+            try:
+                connection_ip = str(ipaddress.ip_address(raw_connection_ip))
+            except ValueError:
+                pass
         seen.add(peer["id"])
         peers.append({"id": peer["id"], "name": clean_text(peer.get("name", "")),
                       "hostname": clean_text(peer.get("hostname", "")),
                       "ip": clean_text(peer.get("ip", "")),
+                      "connection_ip": connection_ip,
                       "created_at": clean_text(peer.get("created_at", ""))})
     return peers
 
@@ -314,11 +323,14 @@ def alert_content(config, item):
             f"Review in your trusted NetBird dashboard: {config.url}\n"
             "Verify the service user, its role, and its tokens.\n")
     if event == PEER_ADDED:
+        public_ip = clean_text(item.get("connection_ip", ""))
+        public_ip_line = f"Public IP (API supplied): {public_ip}\n" if public_ip else ""
         return "NetBird peer added", (
             "A peer appeared in the NetBird account after the event baseline.\n\n"
             f"Name (peer supplied): {clean_text(item.get('name', ''))}\n"
             f"Hostname (peer supplied): {clean_text(item.get('hostname', ''))}\n"
             f"NetBird IP: {clean_text(item.get('ip', ''))}\n"
+            f"{public_ip_line}"
             f"Peer ID: {clean_text(item['id'])}\n"
             f"Created at (API supplied): {clean_text(item.get('created_at', ''))}\n\n"
             f"Review in your trusted NetBird dashboard: {config.url}\n"

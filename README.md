@@ -17,6 +17,7 @@ Self-hosted NetBird API <-- HTTPS GET -- Notifier -- SMTP/TLS --> Your mail prov
 ## Behavior
 
 - Supports regular-user pending approval, regular-user joined, service-user created, and peer-added email alerts. Each event type has an independent true/false setting.
+- Peer-added alerts include the NetBird overlay address and the public connection address returned by NetBird's peers API.
 - Existing pending users are notified on first startup. Creation events silently record the current users, service users, or peers when first enabled, then alert only for later IDs. This prevents an upgrade or first installation from announcing every existing object.
 - Running a polling cycle with a creation event disabled records it as disabled. Its next enablement establishes a new silent baseline, so objects created while it was disabled are not replayed.
 - One accepted alert per event, object ID, and recipient for the lifetime of a state namespace. Approval followed by another pending period does not rearm that user's pending alert; approval can separately produce a joined-user alert.

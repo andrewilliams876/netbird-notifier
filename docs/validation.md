@@ -4,7 +4,7 @@ Last updated 2026-09-12. Results apply to the current local pre-release tree and
 
 ## Passed
 
-- 46 Python tests inside the restricted Linux test image. Six tests use temporary local certificates and synthetic HTTPS/SMTP servers. The synthetic suite uses no external NetBird or mail account.
+- 47 Python tests inside the restricted Linux test image. Six tests use temporary local certificates and synthetic HTTPS/SMTP servers. The synthetic suite uses no external NetBird or mail account.
 - HTTPS verification, hostname mismatch, untrusted certificates, redirects, unauthorized responses, STARTTLS-before-authentication, implicit TLS, and missing STARTTLS behavior.
 - Strict user/peer schemas, regular/service-user classification, active-user filtering, silent creation baselines, enable/disable rebaselining, approval-to-joined transitions, per-recipient retries, lifetime deduplication, restart persistence, schema-1/2-to-3 migration, corruption preservation, lock contention, failed-state commits and safe logs.
 - End-to-end local TLS tests delivered the pending-user, user-joined, service-user-created and peer-added templates, then verified restart deduplication and exactly one users plus one peers request per enabled polling cycle.
@@ -14,6 +14,7 @@ Last updated 2026-09-12. Results apply to the current local pre-release tree and
 - Docker health transitions from healthy to unhealthy after the stored success expires, then back to healthy after a successful synthetic poll.
 - The v0.2.0 development image passed the isolated Compose smoke test as UID/GID 10001 with no capabilities, no-new-privileges, a read-only root filesystem, schema-3 state persistence and health recovery.
 - An authenticated v0.2.0 read-only dry run against self-hosted NetBird Management v0.78.1 successfully validated both `/api/users` and `/api/peers` responses with all four event categories enabled. It sent no mail and changed no state or baselines.
+- The same live peers response confirmed `connection_ip` is available for public-address reporting. Valid IPv4 values were present; one unavailable non-IP marker was safely omitted rather than copied into mail or allowed to fail the polling cycle.
 - A real v0.2.0 `--once` cycle used a separate project and volume, silently baselined the current active users, service users and peers, found no pending regular user, and accepted no mail. A second cycle accepted no mail and added no baseline objects. Read-only state inspection reported schema 3, three active event baselines, the expected hashed-object count and zero sent deliveries; the v0.1.0 production volume was not mounted or migrated.
 - Actionlint accepted the modified CI and release workflows.
 - Verified TLS connection from the production container to `https://netbird.servar.xyz/api/users`; the unauthenticated request returned HTTP 401 as expected. This proves reachability and certificate validation, not authenticated API compatibility.

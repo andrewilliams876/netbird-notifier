@@ -29,7 +29,8 @@ ACTIVE_USER = {"id": "active-123", "email": "active@example.com", "name": "Activ
 SERVICE_USER = {"id": "service-123", "email": "", "name": "Automation",
                 "status": "active", "pending_approval": False, "is_service_user": True}
 PEER = {"id": "peer-123", "name": "workstation", "hostname": "workstation",
-        "ip": "100.64.0.10", "created_at": "2026-09-12T08:00:00Z"}
+        "ip": "100.64.0.10", "connection_ip": "203.0.113.10",
+        "created_at": "2026-09-12T08:00:00Z"}
 
 
 def all_events(config):
@@ -118,6 +119,18 @@ class NotifierTests(unittest.TestCase):
         for payload in ({"peers": [PEER]}, [{}], [PEER, PEER]):
             with self.subTest(payload=payload), self.assertRaises(app.ProtocolError):
                 app.parse_peers(payload)
+
+    def test_peer_connection_ip_is_optional_and_ipv6_is_normalized(self):
+        without = {key: value for key, value in PEER.items() if key != "connection_ip"}
+        self.assertEqual(app.parse_peers([without])[0]["connection_ip"], "")
+        _, body = app.alert_content(self.config, {**without, "event": app.PEER_ADDED})
+        self.assertNotIn("Public IP", body)
+        ipv6 = app.parse_peers([{**PEER, "connection_ip": "2001:0db8::1"}])[0]
+        self.assertEqual(ipv6["connection_ip"], "2001:db8::1")
+        for unavailable in (None, 123, "not-an-ip"):
+            with self.subTest(unavailable=unavailable):
+                parsed = app.parse_peers([{**PEER, "connection_ip": unavailable}])[0]
+                self.assertEqual(parsed["connection_ip"], "")
 
     def test_event_configuration_toggles(self):
         env = {**self.env, "ALERT_USER_PENDING_APPROVAL": "false",
@@ -388,6 +401,9 @@ class NotifierTests(unittest.TestCase):
                     self.assertEqual(message["Subject"], subject)
                     self.assertIsNone(message["Bcc"])
                     self.assertNotIn("\r\nBcc:", message.get_content())
+                    if event == app.PEER_ADDED:
+                        self.assertIn("Public IP (API supplied): 203.0.113.10",
+                                      message.get_content())
 
     def test_missing_starttls_never_authenticates(self):
         with patch.object(app.smtplib, "SMTP") as factory:
