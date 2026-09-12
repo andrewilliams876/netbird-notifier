@@ -1,0 +1,10 @@
+**
+!notifier/
+!notifier/*.py
+!Dockerfile
+!Dockerfile.test
+!requirements-dev.txt
+!tests/
+!tests/*.py
+**/__pycache__
+**/*.pyc

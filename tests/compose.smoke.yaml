@@ -1,0 +1,23 @@
+# Use only with compose.yaml and a separate --project-name.
+services:
+  notifier:
+    healthcheck:
+      interval: 1s
+      timeout: 5s
+      start_period: 0s
+      retries: 1
+    env_file: !reset []
+    environment:
+      PYTHONPATH: /app
+      NETBIRD_URL: https://netbird.example.com
+      SMTP_HOST: smtp.example.com
+      SMTP_USERNAME: sender@example.com
+      SMTP_FROM: sender@example.com
+      SMTP_TO: admin@example.com
+    volumes:
+      - ./tests:/tests:ro
+secrets:
+  netbird_api_token:
+    file: ./artifacts/smoke-token.txt
+  smtp_password:
+    file: ./artifacts/smoke-password.txt

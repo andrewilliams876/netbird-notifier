@@ -1,0 +1,48 @@
+name: netbird-notifier
+services:
+  notifier:
+    container_name: netbird-notifier
+    build: .
+    image: netbird-notifier:0.1.0
+    restart: unless-stopped
+    init: true
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 128m
+    cpus: 0.50
+    stop_grace_period: 45s
+    env_file:
+      - path: .env
+        format: raw
+    environment:
+      STATE_DIR: /data
+      NETBIRD_API_TOKEN_FILE: /run/secrets/netbird_api_token
+      SMTP_PASSWORD_FILE: /run/secrets/smtp_password
+    secrets:
+      - netbird_api_token
+      - smtp_password
+    volumes:
+      - notifier_state:/data
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+    healthcheck:
+      test: [CMD, python, -m, notifier, --healthcheck]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "3"
+secrets:
+  netbird_api_token:
+    file: ./secrets/netbird_api_token.txt
+  smtp_password:
+    file: ./secrets/smtp_password.txt
+volumes:
+  notifier_state:

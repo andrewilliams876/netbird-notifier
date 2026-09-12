@@ -1,0 +1,10 @@
+# Test-only image; never distribute this as the production image.
+FROM netbird-notifier:0.1.0
+USER root
+COPY requirements-dev.txt /tmp/requirements-dev.txt
+RUN python -m ensurepip --upgrade \
+    && python -m pip install --no-cache-dir --upgrade pip==26.2.1 \
+    && python -m pip install --no-cache-dir -r /tmp/requirements-dev.txt
+COPY tests/ /app/tests/
+USER 10001:10001
+ENTRYPOINT ["python", "-m", "unittest", "discover", "-s", "tests", "-v"]
