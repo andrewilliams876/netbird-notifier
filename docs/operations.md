@@ -2,7 +2,7 @@
 
 ## Monitoring
 
-Normal logs contain pending and accepted counts. `poll_failed` includes a safe exception category and HTTP status where available; SMTP response text is deliberately suppressed. Inspect provider/admin logs locally when more detail is needed without sharing credentials or user data.
+Normal logs contain per-event object counts, accepted-delivery counts and silent-baseline counts. `poll_failed` includes a safe exception category and HTTP status where available; SMTP response text is deliberately suppressed. Inspect provider/admin logs locally when more detail is needed without sharing credentials or user data.
 
 Health is a read-only check of the most recent successful poll. It expires after the greater of 180 seconds or three configured polling intervals. API or delivery failures do not advance it. Docker marks the service unhealthy after its configured retries; it does not restart merely because it is unhealthy. `restart: unless-stopped` handles process exits, including persistent errors until the operator stops the service.
 
@@ -20,7 +20,7 @@ Corruption/disk-full errors must not be fixed by automatically deleting the data
 
 ## Upgrade
 
-Back up state, read the changelog, pull the reviewed versioned image and recreate only this service with `docker compose pull` followed by `docker compose up -d`. Contributors can test a source checkout with `compose.build.yaml`. Schema 2 adds failed-delivery ordering to schema 1 without deleting notification history. Do not run an older program against newer state unless that migration is explicitly supported; the original schema-1 application refuses schema 2.
+Back up state, read the changelog, pull the reviewed versioned image and recreate only this service with `docker compose pull` followed by `docker compose up -d`. Contributors can test a source checkout with `compose.build.yaml`. Schema 2 added failed-delivery ordering. Schema 3 adds event baselines and hashed observed-object keys without deleting schema-1/2 pending-user history. Version 0.2.0 deliberately retains the v0.1.x pending-user delivery-key format. Do not run an older program against newer state unless that migration is explicitly supported; v0.1.0 refuses schema 3, so rollback requires restoring a pre-upgrade state backup as well as the old image.
 
 The Python Alpine base is pinned to an image digest. The runtime removes the package installer because it has no third-party Python dependencies. Periodically review a newer supported base, scan it, update the digest and rerun container acceptance tests. Pinning is reproducibility, not automatic patching.
 
@@ -37,6 +37,8 @@ The Python Alpine base is pinned to an image digest. The runtime removes the pac
 | `PermissionError` immediately at startup or during `--check-config` | On Linux, make both `secrets/*.txt` files owned by UID/GID 10001 with mode `0400`; on Windows, check ACLs and Docker file sharing |
 | Cannot write state | Volume mount/ownership, free space, integrity, another process holding the lock |
 | No repeated alert | Expected lifetime deduplication; check user ID, recipient and namespace |
+| No joined/service-user/peer-added alert immediately after enabling | Expected silent first baseline; check `baselined` in logs, then create a controlled new object |
+| New event category is absent | Confirm its `ALERT_*` setting is exactly `true`, run `--dry-run`, and verify the API identity can list that resource |
 | Backlog | Per-poll attempt cap, failing recipients, provider throttling and network delays |
 
-Changing namespace/origin or adding a recipient creates new deduplication identities. Removing then readding the same recipient preserves its old history. A changed SMTP provider or rotated credentials does not reset history.
+Changing namespace or origin creates a separate pending-user history and new creation-event baselines. Adding a recipient can produce a delivery for a user who is still pending, but it does not replay creation events whose object IDs are already observed. Removing then readding the same recipient preserves its old delivery history. A changed SMTP provider or rotated credentials does not reset history.

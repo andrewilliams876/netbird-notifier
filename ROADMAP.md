@@ -1,13 +1,12 @@
 # Roadmap
 
-These are proposals, not implemented features or delivery promises. First release scope is pending regular-user email alerts.
+Version 0.2.0 adds snapshot-based alerts for active regular users joining, service users being created and peers being added. Each uses a silent first-enable baseline and hashed persistent object keys. The remaining entries are proposals, not delivery promises.
 
 | Future capability | Candidate data source | Investigation required |
 | --- | --- | --- |
-| New/deleted peers | `/api/peers` snapshots; audit activity | Startup baseline, stable IDs, missed events, deletion versus permission changes |
+| Deleted peers | `/api/peers` snapshots; audit activity | Missed events, deletion versus permission changes, and whether deleted-object details remain available |
 | Pending peer approval | Peer approval fields where exposed | Edition/version availability; never bypass a restricted feature |
 | Routing-peer disconnect/recovery | Peer connectivity plus Networks/router and legacy Routes configuration | Correct routing membership, redundant routers, debounce duration, outage/recovery state |
-| New users/service users | `/api/users` snapshots or audit activity | Baseline versus new event, identity sync timing and service-user classification |
 | Setup-key events | `/api/setup-keys` snapshots and audit activity | Creation, expiry, revocation, usage semantics; never email actual key material |
 | Webhooks | Independent outbound delivery adapter | HTTPS validation, authentication/signatures, SSRF controls, retries, redaction and idempotency |
 | Slack | Optional independent webhook adapter | Secret URL handling, payload escaping, rate limits and safe delivery retry |

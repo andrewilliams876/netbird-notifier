@@ -1,10 +1,10 @@
 # Legal and licensing findings
 
-Reviewed 2026-09-11. This is a documented technical/licensing assessment, not legal advice or a guarantee against claims. The owner reports open-source self-hosted NetBird Management v0.78.1 and Dashboard v2.92.0. The deployed binaries and any separately accepted contracts have not been inspected.
+Reviewed 2026-09-12. This is a documented technical/licensing assessment, not legal advice or a guarantee against claims. The owner reports open-source self-hosted NetBird Management v0.78.1 and Dashboard v2.92.0. The deployed binaries and any separately accepted contracts have not been inspected.
 
 ## Conclusion within the reviewed scope
 
-An independently written program using the documented users API, with authorized credentials, is a reasonable architecture for this project. It does not copy NetBird implementation code, link its internal libraries, modify its services, invoke its built-in notification system, or bypass license checks. Similarity to a paid feature alone does not establish that the integration infringes a license; equally, it does not establish legal clearance. Contract scope, implementation, branding and applicable law still matter.
+An independently written program using the documented public users and peers APIs, with authorized credentials, is a reasonable architecture for this project. It does not copy NetBird implementation code, link its internal libraries, modify its services, invoke its built-in notification system, or bypass license checks. Similarity to a paid feature alone does not establish that the integration infringes a license; equally, it does not establish legal clearance. Contract scope, implementation, branding and applicable law still matter.
 
 ## Source licenses
 
@@ -14,9 +14,9 @@ The [FSF aggregation discussion](https://www.gnu.org/licenses/gpl-faq.en.html#Me
 
 ## Public API and feature documentation
 
-The [API introduction](https://docs.netbird.io/api) expressly presents the API for application/script automation. The [users contract](https://docs.netbird.io/api/resources/users) exposes the pending-approval field needed here. The [v0.78.1 users handler](https://github.com/netbirdio/netbird/blob/v0.78.1/management/server/http/handlers/users/users_handler.go) implements a user-list GET handler; live account access remains to be tested.
+The [API introduction](https://docs.netbird.io/api) expressly presents the API for application/script automation. The documented [users](https://docs.netbird.io/api/resources/users) and [peers](https://docs.netbird.io/api/resources/peers) resources expose the fields used for the four implemented alert categories. The [v0.78.1 users handler](https://github.com/netbirdio/netbird/blob/v0.78.1/management/server/http/handlers/users/users_handler.go) implements a user-list GET handler. Authenticated read-only access to both resource lists was confirmed against the owner's deployment; that technical test does not determine contractual permission.
 
-The [notifications page](https://docs.netbird.io/manage/settings/notifications) described built-in notifications as cloud-only when reviewed. The [Enterprise overview](https://docs.netbird.io/selfhosted/enterprise) distinguishes self-hosted Enterprise from Cloud Business plans. The earlier assumption that a self-hosted Business license simply unlocks SMTP should therefore not be used as a premise.
+The current [notifications page](https://docs.netbird.io/manage/settings/notifications) says built-in notifications are available in NetBird Cloud and self-hosted Enterprise, and that open-source self-hosted NetBird does not include them. The [Enterprise overview](https://docs.netbird.io/selfhosted/enterprise) distinguishes self-hosted Enterprise from Cloud plans. This project independently observes documented public API resources and delivers its own mail; it does not activate, call, patch, or copy the built-in notification implementation. That technical separation supports the architecture but is not a legal determination about every contract or jurisdiction.
 
 ## Contracts: do not conflate editions
 
@@ -30,7 +30,7 @@ No express standalone API permission covering this exact notifier, and no separa
 
 Use NetBird only descriptively to identify compatibility. Do not use its logo, claim official status/endorsement, or describe the project as a paid-feature/license bypass. The README carries an independence statement. Relevant IP reservations are in the SaaS terms; any commercial naming dispute would need qualified review.
 
-Administrators receive user names, email addresses and IDs through their mail provider. Restrict recipients, review the organization's lawful basis and provider arrangements as applicable, and apply retention/access controls. State hashes are pseudonymous, not guaranteed anonymous. This assessment does not determine compliance with a particular organization's data-protection obligations.
+Administrators can receive user names, email addresses and IDs or peer names, hostnames, addresses and IDs through their mail provider. Restrict enabled events and recipients, review the organization's lawful basis and provider arrangements as applicable, and apply retention/access controls. State hashes are pseudonymous, not guaranteed anonymous. This assessment does not determine compliance with a particular organization's data-protection obligations.
 
 ## Before public release
 
@@ -38,4 +38,4 @@ Confirm the actual edition/binary provenance, any applicable contracts, copyrigh
 
 Optional inquiry draft (not sent):
 
-> We are developing an independent open-source notifier for our open-source self-hosted NetBird deployment. It uses an authorized identity to GET /api/users and sends SMTP alerts through our own mail provider when pending_approval is true. It copies no NetBird code, modifies no NetBird services, and accesses no built-in notification or license-restricted endpoints. Are there applicable API or trademark terms, or other restrictions we should review before publishing this independent integration with a clear non-affiliation statement?
+> We are developing an independent open-source notifier for our open-source self-hosted NetBird deployment. It uses an authorized read-only identity to GET the documented `/api/users` and `/api/peers` resources, compares snapshots locally, and sends selected SMTP alerts through our own mail provider. It copies no NetBird code, modifies no NetBird services, and does not call the built-in notification system. Are there applicable API or trademark terms, or other restrictions we should review for this independent integration with a clear non-affiliation statement?

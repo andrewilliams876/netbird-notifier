@@ -1,6 +1,14 @@
 # Changelog
 
-## Unreleased
+## [0.2.0] - Unreleased
+
+- Added independently configurable email alerts for active regular users joining, service users being created, and peers being added.
+- Added silent first-enable and re-enable baselines so creation-event alerts do not replay existing objects.
+- Added schema 3 with hashed observed-object keys while retaining the v0.1.x pending-user delivery keys and history.
+- Added event-specific subjects and minimal, sanitized user or peer details.
+- Added read-only `/api/peers` polling only when peer-added alerts are enabled; user event types share one `/api/users` request per cycle.
+- Added tests for creation baselines, enable/disable transitions, approval-to-joined transitions, retries, multi-recipient completion, schema migration, restart persistence, malformed peer data and end-to-end TLS delivery for all four events.
+- Documented the required deployment structure and mandatory Linux UID/GID 10001 secret-file ownership.
 
 - Default Compose deployment pulls the versioned image from GitHub Container Registry.
 - Added an explicit local-build Compose override and a dev-to-main contribution flow.

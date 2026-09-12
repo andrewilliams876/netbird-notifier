@@ -10,7 +10,7 @@ Security fixes are provided for the latest released version. Report vulnerabilit
 - Compose secrets are not encrypted at rest by Compose. Docker/host administrators can access them. Treat Docker control as privileged host access.
 - Retain verified TLS. Mount a CA bundle for a private CA rather than disabling verification.
 - Restrict outbound traffic to the NetBird origin, SMTP server and required DNS with host/network policy where practical. Compose does not supply an egress allowlist.
-- Keep the state directory private and on local storage. Hashes are pseudonymous identifiers, not guaranteed anonymization. Email contents include the pending user's name/email/ID; restrict recipients and mailbox retention accordingly.
+- Keep the state directory private and on local storage. Hashes are pseudonymous identifiers, not guaranteed anonymization. Email contents can include user names, email addresses and IDs or peer names, hostnames, addresses and IDs; restrict enabled events, recipients and mailbox retention accordingly.
 - Keep one daemon per volume. Back up state consistently and monitor disk capacity.
 - Never publish `.env`, `secrets/`, state, mailbox contents, debug bundles or genuine API responses.
 - Rebuild and review image/dependency updates. Digest pinning prevents unnoticed changes but also requires deliberate patch updates.

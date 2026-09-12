@@ -18,4 +18,4 @@ Merge the reviewed `dev` changes into `main` and verify CI. Move the changelog e
 
 Do not publish a container registry image unless separately included in the agreed release scope. If distributing images, include provenance/SBOM and applicable third-party notices. Never distribute the development/test image as the runtime image.
 
-Release notes draft: independent pending-user SMTP notifier for self-hosted NetBird; verified HTTPS and configurable SMTP TLS, persistent per-recipient deduplication, hardened Compose and operational commands. SMTP crash ambiguity and polling limitations remain. Insert actual live validation results before publication; do not use this draft as evidence of those results.
+Release notes draft: independent SMTP event notifier for self-hosted NetBird; read-only user/peer polling, silent creation-event baselines, verified HTTPS and configurable SMTP TLS, persistent per-recipient deduplication, hardened Compose and operational commands. SMTP crash ambiguity and snapshot-polling limitations remain. Insert actual live validation results before publication; do not use this draft as evidence of those results.

@@ -4,13 +4,18 @@ Last updated 2026-09-12. Results apply to the current local pre-release tree and
 
 ## Passed
 
-- 33 Python tests on Windows Python 3.12 and inside the restricted Linux test image. Five tests use temporary local certificates and synthetic HTTPS/SMTP servers. No external NetBird or mail account is used.
+- 46 Python tests inside the restricted Linux test image. Six tests use temporary local certificates and synthetic HTTPS/SMTP servers. The synthetic suite uses no external NetBird or mail account.
 - HTTPS verification, hostname mismatch, untrusted certificates, redirects, unauthorized responses, STARTTLS-before-authentication, implicit TLS, and missing STARTTLS behavior.
-- Strict pending-user schema, regular/service-user filtering, per-recipient retries, lifetime deduplication, restart persistence, schema-1-to-2 migration, corruption preservation, lock contention, failed-state commits and safe logs.
+- Strict user/peer schemas, regular/service-user classification, active-user filtering, silent creation baselines, enable/disable rebaselining, approval-to-joined transitions, per-recipient retries, lifetime deduplication, restart persistence, schema-1/2-to-3 migration, corruption preservation, lock contention, failed-state commits and safe logs.
+- End-to-end local TLS tests delivered the pending-user, user-joined, service-user-created and peer-added templates, then verified restart deduplication and exactly one users plus one peers request per enabled polling cycle.
 - Production/test image builds with the pinned official Python Alpine base.
 - Compose configuration and secret mounts using synthetic values.
 - Container UID 10001, zero effective capabilities, no-new-privileges, read-only root filesystem, writable state volume and persistent deduplication across two one-off containers.
 - Docker health transitions from healthy to unhealthy after the stored success expires, then back to healthy after a successful synthetic poll.
+- The v0.2.0 development image passed the isolated Compose smoke test as UID/GID 10001 with no capabilities, no-new-privileges, a read-only root filesystem, schema-3 state persistence and health recovery.
+- An authenticated v0.2.0 read-only dry run against self-hosted NetBird Management v0.78.1 successfully validated both `/api/users` and `/api/peers` responses with all four event categories enabled. It sent no mail and changed no state or baselines.
+- A real v0.2.0 `--once` cycle used a separate project and volume, silently baselined the current active users, service users and peers, found no pending regular user, and accepted no mail. A second cycle accepted no mail and added no baseline objects. Read-only state inspection reported schema 3, three active event baselines, the expected hashed-object count and zero sent deliveries; the v0.1.0 production volume was not mounted or migrated.
+- Actionlint accepted the modified CI and release workflows.
 - Verified TLS connection from the production container to `https://netbird.servar.xyz/api/users`; the unauthenticated request returned HTTP 401 as expected. This proves reachability and certificate validation, not authenticated API compatibility.
 - Authenticated live `GET /api/users` succeeded against self-hosted NetBird Management v0.78.1 using the dedicated service identity. A read-only dry run detected one known pending regular user and sent no email or notification-state update.
 - Zoho SMTP accepted a marked test message and the owner confirmed it arrived in the configured inbox.
@@ -27,9 +32,11 @@ Last updated 2026-09-12. Results apply to the current local pre-release tree and
 
 ## Image scanning
 
-The initial Debian-based image produced high and critical scanner findings. The runtime was moved to the pinned Alpine base and upgraded to fixed `libuuid`; unused Python package-installation tooling was removed from the production image. The final production image scan reported **zero known vulnerabilities**. Direct inspection also confirmed `pip`, `setuptools`, and `msgpack` are absent. A zero-finding scan is a point-in-time database result, not proof that the image is vulnerability-free.
+The initial Debian-based image produced high and critical scanner findings. The runtime was moved to the pinned Alpine base and upgraded to fixed `libuuid`; unused Python package-installation tooling was removed from the production image. The v0.1.0 release and current local v0.2.0 runtime image scans reported **zero known vulnerabilities and zero embedded-secret findings**. Direct inspection also confirmed `pip`, `setuptools`, and `msgpack` are absent. A zero-finding scan is a point-in-time database result, not proof that an image is vulnerability-free.
 
-The local test image reported three findings attributed to inherited `msgpack`/`setuptools` metadata (two high, one medium), although direct runtime inspection of the production image confirms those packages are absent. The test image deliberately installs development-only certificate tooling, is not referenced by Compose, and must never be distributed as the runtime image. This discrepancy should be rechecked with a fresh scanner/SBOM before release; it does not alter the production image's zero-finding result.
+The v0.2.0 distributable-source scan, excluding local `.env`, `secrets/`, Git data and ignored private artifacts by design, reported zero known vulnerabilities and zero secret findings. It reported two low-severity Dockerfile checks because neither Dockerfile embeds a `HEALTHCHECK`; the deployed service defines its healthcheck in `compose.yaml`, and the test image is not distributed. This accepted finding avoids baking deployment-specific health timing into the reusable image.
+
+The current local v0.2.0 test-image scan reproduced three findings attributed to `msgpack`/`setuptools` metadata (two high, one medium). Direct module and installed-distribution inspection found neither package in the final test-image filesystem. The test image deliberately installs development-only certificate tooling, is not referenced by Compose, and must never be distributed as the runtime image. The scanner/metadata discrepancy does not alter the separately scanned production image's zero-finding result.
 
 The local scanner was Trivy using its downloaded advisory database. Docker Scout was unavailable without signing in. The distributable-source secret scan reported zero findings. Scanner reports and exported images live under ignored `artifacts/` and are not release files.
 
@@ -38,5 +45,6 @@ The local scanner was Trivy using its downloaded advisory database. Docker Scout
 - Longer-running provider rate/relay behavior and token-rotation procedure.
 - Longer-running upgrade behavior across future NetBird releases.
 - Private vulnerability-reporting setup.
+- Live creation and delivery for each new v0.2.0 category against the owner's real NetBird/SMTP deployment; the API compatibility check and synthetic deliveries are complete, but release acceptance still requires controlled real events.
 
-At the time of this record, no push, tag, GitHub release or public image had occurred. The owner confirmed real deployment acceptance and authorized public repository publication.
+Version 0.1.0 is public. Version 0.2.0 remains development work on `dev`; it has not been merged to `main`, tagged, released, or published as a stable image.
