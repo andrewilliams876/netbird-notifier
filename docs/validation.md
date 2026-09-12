@@ -21,7 +21,8 @@ Last updated 2026-09-12. Results apply to the current local pre-release tree and
 - The Compose project, runtime image and exact container name were changed to `netbird-notifier`. SQLite online backup migrated the expected single notification record into `netbird-notifier_notifier_state`; the renamed service became healthy and subsequent polls reported zero pending users. The original volume remains available locally as a rollback copy.
 - The final Compose smoke test creates a unique project-scoped state volume, verifies deduplication across containers, exercises healthy/unhealthy recovery, and removes only its synthetic resources. This also verifies test projects do not share the production volume.
 - On the `dev` branch, the pull-based Compose definition and separate local-build override both passed Compose validation. The local-build override built successfully, and the pull-based definition was exercised against the locally tagged GHCR image while preserving production state; the service returned healthy as UID/GID 10001 and accepted no duplicate alert.
-- Main-branch CI publishes a mutable `main` preview only after tests pass. Stable release automation validates semantic-version tags, tests the exact tagged source, publishes immutable versioned and mutable `latest` GHCR tags with the repository workflow token, and refuses to replace an existing versioned image tag. GitHub-hosted execution and anonymous GHCR pull remain pending until these changes are approved for `main`.
+- Main-branch CI passed and published the mutable `main` preview after the merge tests succeeded. Stable release automation retested tag `v0.1.0`, published immutable `0.1.0` and mutable `latest` GHCR tags with the repository workflow token, and retained the existing GitHub release. The final workflow is manual-only and refuses to replace an existing versioned image tag.
+- An anonymous pull using an empty Docker credential directory downloaded `ghcr.io/andrewilliams876/netbird-notifier:0.1.0` with digest `sha256:522bc1fe28b81ced82894777e9692a08948b56cca9e15d6bb3ecdb80d34ee6d3`. The production Compose service was recreated from that registry image, retained its state volume, became healthy as UID/GID 10001, and accepted no duplicate alert.
 - Final source secret scan found zero findings in distributable files. `.env`, `secrets/`, state, Git metadata and generated scan artifacts were excluded by design and are ignored by Git; they require separate operator protection.
 
 ## Image scanning
@@ -36,6 +37,6 @@ The local scanner was Trivy using its downloaded advisory database. Docker Scout
 
 - Longer-running provider rate/relay behavior and token-rotation procedure.
 - Longer-running upgrade behavior across future NetBird releases.
-- GitHub CI execution for the current `dev` changes, first GHCR publication/anonymous pull, and private vulnerability-reporting setup.
+- Private vulnerability-reporting setup.
 
 At the time of this record, no push, tag, GitHub release or public image had occurred. The owner confirmed real deployment acceptance and authorized public repository publication.
