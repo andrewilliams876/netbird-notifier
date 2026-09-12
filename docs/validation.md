@@ -4,7 +4,7 @@ Last updated 2026-09-12. Results apply to the current local pre-release tree and
 
 ## Passed
 
-- 32 Python tests on Windows Python 3.12 and inside the restricted Linux test image. Five tests use temporary local certificates and synthetic HTTPS/SMTP servers. No external NetBird or mail account is used.
+- 33 Python tests on Windows Python 3.12 and inside the restricted Linux test image. Five tests use temporary local certificates and synthetic HTTPS/SMTP servers. No external NetBird or mail account is used.
 - HTTPS verification, hostname mismatch, untrusted certificates, redirects, unauthorized responses, STARTTLS-before-authentication, implicit TLS, and missing STARTTLS behavior.
 - Strict pending-user schema, regular/service-user filtering, per-recipient retries, lifetime deduplication, restart persistence, schema-1-to-2 migration, corruption preservation, lock contention, failed-state commits and safe logs.
 - Production/test image builds with the pinned official Python Alpine base.

@@ -4,6 +4,7 @@
 
 - Independent read-only polling of pending regular users through the NetBird API.
 - Provider-agnostic TLS SMTP and separate recipient delivery.
+- Optional validated SMTP sender display name while retaining a valid envelope address.
 - Persistent SQLite deduplication, failed-attempt ordering and safe corruption behavior.
 - Configuration checks, dry run, test email, once mode and healthcheck.
 - Restricted Docker Compose deployment and pinned Python base image.

@@ -14,7 +14,8 @@ The Compose file supplies `STATE_DIR` and secret-file paths. `.env` supplies oth
 | `SMTP_USERNAME` | Required when authentication is enabled |
 | `SMTP_PASSWORD_FILE` | Compose: `/run/secrets/smtp_password` |
 | `SMTP_PASSWORD` | Alternative to password file; do not supply both |
-| `SMTP_FROM` | Required bare ASCII email address, no display name |
+| `SMTP_FROM` | Required bare ASCII envelope/header email address, no display name |
+| `SMTP_FROM_NAME` | Optional display name shown by mail clients, for example `NetBird`; maximum 128 characters and no control characters |
 | `SMTP_TO` | Required comma-separated bare ASCII addresses, at most 20; exact duplicates removed |
 | `ALLOW_INSECURE_SMTP` | `false`; must explicitly be true for plaintext SMTP |
 | `STATE_DIR` | `/data`; use persistent local storage |

@@ -52,6 +52,7 @@ class NotifierTests(unittest.TestCase):
                  ("NETBIRD_URL", "https://api.netbird.io"), ("NETBIRD_URL", "https://example.com?x=1"),
                  ("NETBIRD_URL", "https://example.com/other"), ("SMTP_TO", "a@b\r\nBcc:c@d"),
                  ("SMTP_FROM", "Sender <a@b>"), ("SMTP_SECURITY", "auto"),
+                 ("SMTP_FROM_NAME", "NetBird\r\nBcc: x@y"),
                  ("SMTP_AUTH", "yes"), ("POLL_INTERVAL_SECONDS", "0"),
                  ("SMTP_PORT", "99999"), ("NETBIRD_API_TOKEN", "x\r\ny")]
         for key, value in cases:
@@ -216,7 +217,18 @@ class NotifierTests(unittest.TestCase):
             message = server.send_message.call_args.args[0]
             self.assertIsNone(message["Bcc"])
             self.assertEqual(message["Subject"], "NetBird user awaiting approval")
+            self.assertEqual(str(message["From"]), "sender@example.com")
             server.close.assert_called_once()
+
+    def test_sender_display_name(self):
+        config = app.Config.load({**self.env, "SMTP_FROM_NAME": "NetBird"})
+        with patch.object(app.smtplib, "SMTP") as factory:
+            factory.return_value.send_message.return_value = {}
+            app.send_alert(config, USER, config.recipients[0], "key")
+            message = factory.return_value.send_message.call_args.args[0]
+            self.assertEqual(str(message["From"]), "NetBird <sender@example.com>")
+            self.assertEqual(factory.return_value.send_message.call_args.kwargs["from_addr"],
+                             "sender@example.com")
 
     def test_missing_starttls_never_authenticates(self):
         with patch.object(app.smtplib, "SMTP") as factory:

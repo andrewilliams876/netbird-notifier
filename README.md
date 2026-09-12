@@ -63,6 +63,8 @@ Set the SMTP hostname shown in your account's server configuration; Zoho account
 
 Other providers use the same generic settings. This application supports SMTP AUTH through Python's `smtplib.login` (server-supported CRAM-MD5, PLAIN, LOGIN), exclusively over TLS. Providers that require OAuth need a supported relay or future OAuth support. Sender authentication, account permissions, SPF/DKIM/DMARC, quotas and spam filtering remain provider/operator responsibilities.
 
+Keep `SMTP_FROM` as the real permitted email address. Set `SMTP_FROM_NAME=NetBird` to show **NetBird** as the sender name in supporting mail clients.
+
 ## Commands
 
 | Command argument | Effect |

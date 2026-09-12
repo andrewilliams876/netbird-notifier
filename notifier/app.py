@@ -3,6 +3,7 @@
 import argparse
 from contextlib import closing
 from dataclasses import dataclass, field
+from email.headerregistry import Address
 from email.message import EmailMessage
 from email.utils import formatdate
 import hashlib
@@ -71,6 +72,13 @@ def address(value):
     return value
 
 
+def display_name(value):
+    value = value.strip()
+    if len(value) > 128 or any(ord(c) < 32 or ord(c) == 127 for c in value):
+        raise ConfigError("SMTP_FROM_NAME contains invalid characters or is too long")
+    return value
+
+
 @dataclass(frozen=True)
 class Config:
     url: str
@@ -82,6 +90,7 @@ class Config:
     username: str = field(repr=False)
     password: str = field(repr=False)
     sender: str
+    sender_name: str
     recipients: tuple
     state_dir: Path
     namespace: str
@@ -138,6 +147,7 @@ class Config:
         return cls(url, token, smtp_host,
                    integer(env, "SMTP_PORT", 465 if security == "ssl" else 587, 1, 65535),
                    security, auth, username, password, address(env.get("SMTP_FROM", "")),
+                   display_name(env.get("SMTP_FROM_NAME", "")),
                    recipients, Path(env.get("STATE_DIR", "/data")), namespace,
                    integer(env, "POLL_INTERVAL_SECONDS", 60, 30, 86400),
                    integer(env, "NETWORK_TIMEOUT_SECONDS", 20, 1, 120),
@@ -203,7 +213,7 @@ def digest(*parts):
 
 def send_alert(config, user, recipient, key, test=False):
     message = EmailMessage()
-    message["From"] = config.sender
+    message["From"] = Address(display_name=config.sender_name, addr_spec=config.sender)
     message["To"] = recipient
     message["Subject"] = "Notifier test email" if test else "NetBird user awaiting approval"
     message["Date"] = formatdate(localtime=False, usegmt=True)
