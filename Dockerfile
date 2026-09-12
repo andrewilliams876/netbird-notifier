@@ -1,5 +1,14 @@
 ARG PYTHON_IMAGE=python:3.12-alpine@sha256:b64631e04e4920160c50fbe8d8df828f7f35f06f425cb44aa09bca53e708a35a
 FROM ${PYTHON_IMAGE}
+ARG VERSION=dev
+ARG REVISION=unknown
+LABEL org.opencontainers.image.title="netbird-notifier" \
+      org.opencontainers.image.description="Pending-user email notifier for self-hosted NetBird" \
+      org.opencontainers.image.source="https://github.com/andrewilliams876/netbird-notifier" \
+      org.opencontainers.image.url="https://github.com/andrewilliams876/netbird-notifier" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.revision="${REVISION}"
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /app
 RUN apk add --no-cache --upgrade libuuid=2.42.3-r1 \

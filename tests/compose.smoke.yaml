@@ -1,6 +1,8 @@
 # Use only with compose.yaml and a separate --project-name.
 services:
   notifier:
+    image: netbird-notifier:0.1.0
+    pull_policy: never
     healthcheck:
       interval: 1s
       timeout: 5s

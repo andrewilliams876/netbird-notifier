@@ -17,3 +17,27 @@ jobs:
       - name: Verify Compose restrictions and persistence
         shell: pwsh
         run: ./tests/check-container.ps1
+
+  publish-main-image:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Build main preview image
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+          docker build \
+            --build-arg VERSION=main \
+            --build-arg REVISION="$GITHUB_SHA" \
+            -t "$IMAGE:main" .
+      - name: Publish main preview image
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+          echo "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker push "$IMAGE:main"
