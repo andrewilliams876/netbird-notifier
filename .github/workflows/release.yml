@@ -1,0 +1,78 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches:
+      - main
+    paths:
+      - .github/workflows/release.yml
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to release
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || (github.ref_type == 'tag' && github.ref_name || 'v0.1.0') }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Validate release tag
+        shell: bash
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Release tag must use vMAJOR.MINOR.PATCH format" >&2
+            exit 1
+          fi
+
+      - name: Check out tagged source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+
+      - name: Build production image
+        run: docker build -t netbird-notifier:${RELEASE_TAG#v} .
+
+      - name: Build and run test image
+        run: |
+          docker tag netbird-notifier:${RELEASE_TAG#v} netbird-notifier:0.1.0
+          docker build -f Dockerfile.test -t netbird-notifier-tests:release .
+          docker run --rm --read-only --cap-drop ALL \
+            --security-opt no-new-privileges:true --pids-limit 64 --memory 256m \
+            --tmpfs /tmp:rw,noexec,nosuid,size=64m netbird-notifier-tests:release
+
+      - name: Publish GitHub release
+        shell: bash
+        run: |
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "$RELEASE_TAG is already published"
+            exit 0
+          fi
+          cat > release-notes.md <<'EOF'
+          Independent pending-user email notifier for self-hosted NetBird.
+
+          Highlights:
+          - Read-only polling of users awaiting approval
+          - Provider-agnostic SMTP with STARTTLS or implicit TLS
+          - Optional sender display name
+          - Persistent per-recipient deduplication in SQLite
+          - Hardened non-root Docker Compose deployment
+          - Configuration checks, dry-run, test-email and healthcheck modes
+
+          Tested with self-hosted NetBird Management v0.78.1 and Zoho SMTP. See `docs/validation.md` for the full validation record and `SECURITY.md` for deployment guidance and residual risks.
+
+          This community project is not affiliated with or endorsed by NetBird.
+          EOF
+          gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --verify-tag --title "netbird-notifier ${RELEASE_TAG#v}" \
+            --notes-file release-notes.md
