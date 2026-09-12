@@ -85,7 +85,9 @@ jobs:
           Independent email event notifier for self-hosted NetBird.
 
           Highlights:
-          - Read-only polling of enabled user and peer events
+          - Read-only alerts for pending users, joined users, new service users and new peers
+          - Pending-user alerts rearm after a successful poll sees the user leave the pending state
+          - Peer-added alerts include the API-supplied public connection IP when valid
           - Silent baselines for creation-event detection
           - Provider-agnostic SMTP with STARTTLS or implicit TLS
           - Optional sender display name

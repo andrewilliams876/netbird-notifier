@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.2.0] - Unreleased
+## [0.2.0] - 2026-09-12
 
 - Added the public connection IP returned by NetBird to peer-added email alerts.
 - Rearmed pending-user notifications after a successful poll observes that the user is no longer pending, while retaining one delivery per recipient during each continuous pending episode.
@@ -11,11 +11,11 @@
 - Added read-only `/api/peers` polling only when peer-added alerts are enabled; user event types share one `/api/users` request per cycle.
 - Added tests for creation baselines, enable/disable transitions, approval-to-joined transitions, retries, multi-recipient completion, schema migration, restart persistence, malformed peer data and end-to-end TLS delivery for all four events.
 - Documented the required deployment structure and mandatory Linux UID/GID 10001 secret-file ownership.
-
 - Default Compose deployment pulls the versioned image from GitHub Container Registry.
 - Added an explicit local-build Compose override and a dev-to-main contribution flow.
 - Main updates publish a `main` preview image; stable release publication remains explicit and versioned image tags are not overwritten.
 - Added OCI source, license, version and revision metadata to locally and remotely built images.
+- Removed package-installation tooling and its bundled advisory metadata from the ephemeral test image after development dependencies are installed.
 
 ## [0.1.0] - 2026-09-12
 

@@ -6,7 +6,7 @@ An independent community project for use with self-hosted NetBird. Not affiliate
 
 Poll the read-only NetBird users and peers APIs and email administrators about selected account events. The notifier sends mail directly through your SMTP provider; NetBird does not need SMTP configured. It never approves users or changes NetBird.
 
-**Status:** version 0.1.0 is the current stable release. Version 0.2.0 is under validation on `dev`; see [validation](docs/validation.md) for the evidence and limitations.
+**Status:** version 0.2.0 is the current stable release; see [validation](docs/validation.md) for the evidence and limitations.
 
 ```text
 Self-hosted NetBird API <-- HTTPS GET -- Notifier -- SMTP/TLS --> Your mail provider
