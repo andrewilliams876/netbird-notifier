@@ -26,6 +26,29 @@ The Python Alpine base is pinned to an image digest. The runtime removes the pac
 
 ## Troubleshooting
 
+### Expired API token (HTTP 401)
+
+Check the notifier service user's token expiration in NetBird. Create a replacement token for the same identity without increasing its role. On the Linux deployment host, from the notifier directory:
+
+```bash
+sudo chmod 0600 secrets/netbird_api_token.txt
+sudo nano secrets/netbird_api_token.txt
+sudo chown 10001:10001 secrets/netbird_api_token.txt
+sudo chmod 0400 secrets/netbird_api_token.txt
+docker compose run --rm notifier --dry-run
+```
+
+Replace the entire file contents with only the new token. Do not paste tokens into shell commands, logs, issues or screenshots. After a successful dry run, reload the running service:
+
+```bash
+docker compose up -d --force-recreate notifier
+docker compose logs --tail=30 notifier
+```
+
+Credentials are loaded at process startup; editing the file alone does not refresh the running process. Recreation also refreshes the secret bind mount if the editor replaced the file. Keep the existing state volume. Set a renewal reminder before the new token expires. On Windows, edit the file using the existing restricted ACLs, then run the same dry-run and recreation commands.
+
+### Other symptoms
+
 | Symptom | Check |
 | --- | --- |
 | HTTP 401 | Expired/revoked token; correct token file and origin |

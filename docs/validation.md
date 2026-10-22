@@ -1,6 +1,15 @@
 # Validation record
 
-Last updated 2026-09-12. Results apply to the released v0.2.0 source and container image.
+Last updated 2026-10-22. The September results below describe released v0.2.0. The October maintenance checks describe the base-image update prepared on `dev` for the `main` preview; it is not a new stable release.
+
+## October maintenance check (unreleased)
+
+- On 2026-10-22, the owner confirmed renewed pending-user email delivery against NetBird Management v0.81.3 after replacing an expired service-user token. This validates that live path, not every event type against this NetBird version.
+- Fresh Trivy vulnerability and embedded-secret scans of released image `0.2.0` (digest `sha256:123d387fd39d05f8a138d9723c4d7a16fab64dec8dd0c2c20d1b7a2ab0e9ba16`) reported three package findings: `CVE-2026-85091` in zlib (medium), and `CVE-2026-107891` in musl and musl-utils (unknown severity). Trivy warned that the latter advisory's details were unavailable. No embedded secrets were reported. These results supersede the September clean scan for current maintenance decisions.
+- Updated the official Python base pin to `sha256:92abd2ba1bdfb48b1e2ac224b582dd1558d0d4bb11c903b126b5bf9c448fd656`; the locally tested Linux/amd64 runtime reports Python 3.12.15 and Alpine 3.24.3.
+- All 47 tests passed in the rebuilt restricted test container. The isolated Compose smoke test passed non-root permissions, read-only root, persistent deduplication and healthy/unhealthy/healthy recovery, then removed its synthetic resources.
+- Fresh Trivy scans of both rebuilt runtime and test images reported zero known vulnerabilities and zero embedded-secret findings. These were vulnerability/secret scans, not a new misconfiguration scan or full source audit. Scanner image digest: `sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c`.
+- Reports are retained locally under ignored `artifacts/maintenance-2026-10-22/`. No production state or credentials were used by the synthetic checks. The candidate has not been deployed to the user's server or published as a release.
 
 ## Passed
 

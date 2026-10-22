@@ -42,7 +42,7 @@ The notifier uses `GET /api/users` for user event types and `GET /api/peers` onl
 
 Responses are capped at 5 MiB and must be JSON arrays. Pagination is not implemented because the reviewed users and peers endpoints return arrays without documented pagination; verify this again on upgrades. Snapshot comparison cannot recover objects created and removed between successful polls.
 
-The deployment owner reports Management v0.78.1 and Dashboard v2.92.0. The v0.78.1 HTTP handler and public API contract have been reviewed; live compatibility and visibility remain acceptance checks.
+The deployment owner currently reports Management v0.81.3. Pending-user email delivery with Zoho SMTP was confirmed on that version on 22 October 2026 after token renewal. Earlier acceptance testing covered all four event types on Management v0.78.1. See [validation](validation.md) for evidence and limitations; visibility and enabled event types should be checked on each deployment.
 
 Prefer a dedicated Auditor identity where available. Auditor is broadly read-only, not restricted to just the selected events, and may expose sensitive users, peers, and configuration. A normal User role may not return the whole account. If the installed edition cannot grant the required read access without broader privilege, document and approve that tradeoff before deploying; do not silently upgrade the role. Token rotation and expiry are the operator's responsibility.
 

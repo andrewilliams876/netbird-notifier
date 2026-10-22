@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+- Refresh the pinned Python Alpine base to Python 3.12.15 / Alpine 3.24.3, addressing scanner findings in musl, musl-utils and zlib in the released 0.2.0 image.
+- Document API-token replacement and the October maintenance validation.
+
 ## [0.2.0] - 2026-09-12
 
 - Added the public connection IP returned by NetBird to peer-added email alerts.

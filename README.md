@@ -8,6 +8,8 @@ Poll the read-only NetBird users and peers APIs and email administrators about s
 
 **Status:** version 0.2.0 is the current stable release; see [validation](docs/validation.md) for the evidence and limitations.
 
+**Tested with:** self-hosted NetBird Management v0.78.1 and Zoho SMTP, with pending-user email delivery also confirmed on Management v0.81.3 on 22 October 2026. See [validation](docs/validation.md) for the scope of testing.
+
 ```text
 Self-hosted NetBird API <-- HTTPS GET -- Notifier -- SMTP/TLS --> Your mail provider
                                           |
