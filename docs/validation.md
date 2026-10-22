@@ -10,7 +10,8 @@ Last updated 2026-10-22. The September results below describe v0.2.0. The Octobe
 - All 47 tests passed in the rebuilt restricted test container. The isolated Compose smoke test passed non-root permissions, read-only root, persistent deduplication and healthy/unhealthy/healthy recovery, then removed its synthetic resources.
 - Fresh Trivy scans of both rebuilt runtime and test images reported zero known vulnerabilities and zero embedded-secret findings. These were vulnerability/secret scans, not a new misconfiguration scan or full source audit. Scanner image digest: `sha256:790fd66d1697395d8693d1acaa1ea702406a20f109b6fc7bac8db623eca6c06c`.
 - The release-candidate Git history secret scan found no leaks. A fresh source secret/misconfiguration scan found no secret findings and repeated the two accepted low-severity Dockerfile healthcheck findings documented below; the deployed healthcheck remains defined in `compose.yaml`.
-- Reports are retained locally under ignored `artifacts/maintenance-2026-10-22/`. No production state or credentials were used by the synthetic checks. The candidate has not been deployed to the user's server; publication checks are recorded below after the release workflow completes.
+- Reports are retained locally under ignored `artifacts/maintenance-2026-10-22/`. No production state or credentials were used by the synthetic checks. The candidate had not been deployed to the user's server before publication.
+- GitHub Actions passed on `dev` and `main`. The manually authorized `v0.2.1` release workflow rebuilt and retested the tagged source, published the GitHub release, pushed immutable image `0.2.1`, and updated `latest`. Anonymous registry pulls resolved both tags to digest `sha256:c0a383b0fde82b6f7824a33d1952f4bbaddca80e9fad73fdc18a8a478ce9e872`; the image reports application version `0.2.1`, revision `f55b7138b805045df35ef76eed082995f8e52219`, Python 3.12.15 and Alpine 3.24.3.
 
 ## Passed
 
