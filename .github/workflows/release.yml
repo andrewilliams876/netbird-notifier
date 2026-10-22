@@ -95,7 +95,7 @@ jobs:
           - Hardened non-root Docker Compose deployment
           - Configuration checks, dry-run, test-email and healthcheck modes
 
-          Tested with self-hosted NetBird Management v0.78.1 and Zoho SMTP. See `docs/validation.md` for the full validation record and `SECURITY.md` for deployment guidance and residual risks.
+          Tested with self-hosted NetBird Management v0.78.1 and Zoho SMTP. Pending-user email delivery was also confirmed with Management v0.81.3 on 22 October 2026. See `docs/validation.md` for the scope, full validation record and limitations, and `SECURITY.md` for deployment guidance and residual risks.
 
           This community project is not affiliated with or endorsed by NetBird.
           EOF

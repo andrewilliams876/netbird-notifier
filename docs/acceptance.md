@@ -1,6 +1,6 @@
 # Deployment acceptance
 
-Use this checklist before approving a release. Record version, date and results without secrets or real profile data. Current target reported by the owner: NetBird Management v0.78.1, Dashboard v2.92.0, open-source self-hosted.
+Use this checklist before approving a release. Record version, date and results without secrets or real profile data. Current target reported by the owner: NetBird Management v0.81.3, open-source self-hosted. The currently installed Dashboard version was not re-recorded during the October maintenance check.
 
 1. Confirm the HTTPS origin and dedicated identity role. Configure ignored `.env` and secret files locally. Confirm recipient addresses before sending mail.
 2. Run Compose validation and `--check-config` as described in README. Verify the image runs as UID 10001 and reads mounted secrets without exposing their contents.

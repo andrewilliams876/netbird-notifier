@@ -1,9 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [0.2.1] - 2026-10-22
 
 - Refresh the pinned Python Alpine base to Python 3.12.15 / Alpine 3.24.3, addressing scanner findings in musl, musl-utils and zlib in the released 0.2.0 image.
-- Document API-token replacement and the October maintenance validation.
+- Document API-token replacement and validation of pending-user email delivery with NetBird Management v0.81.3.
 
 ## [0.2.0] - 2026-09-12
 

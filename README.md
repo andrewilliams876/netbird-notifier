@@ -6,7 +6,7 @@ An independent community project for use with self-hosted NetBird. Not affiliate
 
 Poll the read-only NetBird users and peers APIs and email administrators about selected account events. The notifier sends mail directly through your SMTP provider; NetBird does not need SMTP configured. It never approves users or changes NetBird.
 
-**Status:** version 0.2.0 is the current stable release; see [validation](docs/validation.md) for the evidence and limitations.
+**Status:** version 0.2.1 is the current stable release; see [validation](docs/validation.md) for the evidence and limitations.
 
 **Tested with:** self-hosted NetBird Management v0.78.1 and Zoho SMTP, with pending-user email delivery also confirmed on Management v0.81.3 on 22 October 2026. See [validation](docs/validation.md) for the scope of testing.
 
@@ -139,7 +139,13 @@ For that upgrade, also copy the desired `ALERT_*` settings from the new `.env.ex
 
 Compose recreates the container with the downloaded image and retains the named state volume. Never add `--volumes` during an ordinary upgrade. Version 0.2.0 migrates state to schema 3; v0.1.0 refuses that newer schema. A rollback to v0.1.0 therefore requires restoring the private pre-upgrade volume backup as well as the previous image tag.
 
-The mutable `latest` tag is published for convenience, but the versioned tag is recommended for predictable deployments. Changes merged into `main` run validation and update the `main` preview image without becoming a stable release. A maintainer-approved release publishes a new versioned image, updates `latest`, and creates the corresponding GitHub release.
+For the v0.2.0 to v0.2.1 maintenance upgrade, change the image line to:
+
+```yaml
+image: ghcr.io/andrewilliams876/netbird-notifier:0.2.1
+```
+
+This patch refreshes the container base and does not change the application state schema. The mutable `latest` tag is published for convenience, but the versioned tag is recommended for predictable deployments. Changes merged into `main` run validation and update the `main` preview image without becoming a stable release. A maintainer-approved release publishes a new versioned image, updates `latest`, and creates the corresponding GitHub release.
 
 ## Zoho and other providers
 
